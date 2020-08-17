@@ -15,7 +15,9 @@
     <description>Final Project for Udacity's Spring Boot Basics course.</description>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>14</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <dependencies>
