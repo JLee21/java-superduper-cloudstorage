@@ -4,7 +4,24 @@ public class Note {
     private Integer noteId;
     private String noteTitle;
     private String noteDescription;
-    private String userId;
+    private Integer userId;
+
+    public Note() {
+    }
+
+    public Note(String noteTitle, String noteDescription, Integer userId) {
+        this.noteTitle = noteTitle;
+        this.noteDescription = noteDescription;
+        this.userId = userId;
+    }
+
+    // Constructor with all arguments
+    public Note(Integer noteId, String noteTitle, String noteDescription, Integer userId) {
+        this.noteId = noteId;
+        this.noteTitle = noteTitle;
+        this.noteDescription = noteDescription;
+        this.userId = userId;
+    }
 
     public Integer getNoteId() {
         return noteId;
@@ -30,11 +47,11 @@ public class Note {
         this.noteDescription = noteDescription;
     }
 
-    public String getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 }

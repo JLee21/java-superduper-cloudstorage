@@ -15,15 +15,20 @@ public class NoteService {
         this.noteMapper = noteMapper;
     }
 
-    public List<Note> listNotes(String username){
-        return this.noteMapper.listNotes(username);
+    public List<Note> listNotes(Integer userId) {
+        return this.noteMapper.listNotes(userId);
     }
 
-    public Integer addNote(Note note){
+    public Integer addNote(Note note) {
         return this.noteMapper.insert(note);
     }
 
-    public void deleteNote(String noteId){
+    public void deleteNote(Integer noteId) {
         this.noteMapper.delete(noteId);
+    }
+
+    public void updateNote(Integer noteId, String noteTitle, String noteDescription, Integer userId) {
+        Note updatedNote = new Note(noteId, noteTitle, noteDescription, userId);
+        this.noteMapper.update(updatedNote);
     }
 }

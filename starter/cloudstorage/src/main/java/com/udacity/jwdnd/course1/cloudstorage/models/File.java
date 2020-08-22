@@ -2,11 +2,23 @@ package com.udacity.jwdnd.course1.cloudstorage.models;
 
 public class File {
     private Integer fileId;
-    private String filename;
+    private String fileName;
     private String contentType;
-    private String fileSize;
+    private long fileSize;
+    private byte[] fileData;
     private Integer userId;
-    private Byte[] fileData;
+
+    public File() {
+
+    }
+
+    public File(String fileName, String contentType, long fileSize, byte[] fileData, Integer userId) {
+        this.fileName = fileName;
+        this.contentType = contentType;
+        this.fileSize = fileSize;
+        this.fileData = fileData;
+        this.userId = userId;
+    }
 
     public Integer getFileId() {
         return fileId;
@@ -16,12 +28,12 @@ public class File {
         this.fileId = fileId;
     }
 
-    public String getFilename() {
-        return filename;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setFilename(String filename) {
-        this.filename = filename;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getContentType() {
@@ -32,12 +44,20 @@ public class File {
         this.contentType = contentType;
     }
 
-    public String getFileSize() {
+    public long getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(String fileSize) {
+    public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
+    }
+
+    public byte[] getFileData() {
+        return fileData;
+    }
+
+    public void setFileData(byte[] fileData) {
+        this.fileData = fileData;
     }
 
     public Integer getUserId() {
@@ -46,13 +66,5 @@ public class File {
 
     public void setUserId(Integer userId) {
         this.userId = userId;
-    }
-
-    public Byte[] getFileData() {
-        return fileData;
-    }
-
-    public void setFileData(Byte[] fileData) {
-        this.fileData = fileData;
     }
 }

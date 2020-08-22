@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
@@ -20,7 +21,7 @@ public interface NoteMapper {
      * @return
      */
     @Select("SELECT * FROM NOTES WHERE userid = #{userId}")
-    List<Note> listNotes(String userId);
+    List<Note> listNotes(Integer userId);
 
     /**
      * Insert a Note
@@ -31,16 +32,15 @@ public interface NoteMapper {
     @Insert("INSERT INTO NOTES (notetitle, notedescription, userid) " +
             "VALUES(#{noteTitle}, #{noteDescription}, #{userId})")
     @Options(useGeneratedKeys = true, keyProperty = "noteId")
-    int insert(Note note);
+    Integer insert(Note note);
 
     /**
      * Update a Note
      *
      * @param note
      */
-    @Update("UPDATE NOTES SET notetitle =# {noteTitle}, notedescription =# {noteDescription} " +
-            "WHERE noteid =# {noteId}")
-    void update(Note note);
+    @Update("UPDATE NOTES SET notetitle = #{note.noteTitle}, notedescription = #{note.noteDescription}, userId = #{note.userId} WHERE noteid = #{note.noteId}")
+    void update(@Param("note") Note note);
 
     /**
      * Delete a Note
@@ -48,5 +48,5 @@ public interface NoteMapper {
      * @param noteId
      */
     @Delete("DELETE FROM NOTES WHERE noteid = #{noteId}")
-    void delete(String noteId);
+    void delete(Integer noteId);
 }
