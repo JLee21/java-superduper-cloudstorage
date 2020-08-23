@@ -53,6 +53,7 @@ public class EncryptionService {
     }
 
     public String createSecretKey() {
+        // some help from here https://knowledge.udacity.com/questions/275248
         try {
             KeyGenerator gen = KeyGenerator.getInstance("AES");
             gen.init(128); /* 128-bit AES */
