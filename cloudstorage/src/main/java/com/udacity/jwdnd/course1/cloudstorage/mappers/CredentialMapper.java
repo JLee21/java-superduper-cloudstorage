@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
@@ -15,16 +16,16 @@ import java.util.List;
 public interface CredentialMapper {
 
     /**
-     * Fetch all Credentials belonging to a User
+     * Fetch all Credentials by UserID
      */
     @Select("SELECT * FROM CREDENTIALS WHERE userid = #{userId}")
     List<Credential> listCredentials(Integer userId);
 
     /**
-     * Fetch a Credential from credentialId
+     * Fetch a Credential by ID
      */
     @Select("SELECT * FROM CREDENTIALS WHERE credentialid = #{credentialId}")
-    List<Credential> getCredential(Integer credentialId);
+    Credential getCredentialById(Integer credentialId);
 
     /**
      * Insert a Credential
@@ -37,13 +38,13 @@ public interface CredentialMapper {
     /**
      * Update a Credential
      */
-    @Update("UPDATE CREDENTIALS SET url=#{url}, username=#{username} key=#{key} password=#{password} userId=#{userId}" +
-            "WHERE credentialid=#{credentialId}")
-    void update(Note note);
+    @Update("UPDATE CREDENTIALS SET url=#{credential.url}, username=#{credential.username}, key=#{credential.key}, password=#{credential.password} " +
+            "WHERE credentialId = #{credential.credentialId}")
+    void update(@Param("credential") Credential credential);
 
     /**
      * Delete a Credential
      */
     @Delete("DELETE FROM CREDENTIALS WHERE credentialid = #{credentialId}")
-    void delete (String credentialId);
+    void delete (Integer credentialId);
 }

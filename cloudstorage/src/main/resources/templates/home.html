@@ -24,9 +24,17 @@
         <div id="file-error-msg" th:if="${fileError}" th:text="${fileError}"
              class="alert alert-danger" role="alert"/>
 
+        <!--CREDENTIAL FEEDBACK TOASTS            -->
+        <div id="file-success-msg" th:if="${credentialSuccess}" th:text="${credentialSuccess}"
+             class="alert alert-success" role="alert"/>
+        <div id="file-error-msg" th:if="${credentialError}" th:text="${credentialError}"
+             class="alert alert-danger" role="alert"/>
+
+        <a href="/home">Home</a>
+
         <!--Logout Button            -->
         <div id="logoutDiv">
-            <form action="#" method="POST">
+            <form th:action="@{/logout}" method="POST">
                 <button type="submit" class="btn btn-secondary float-right">Logout</button>
             </form>
         </div>
@@ -162,6 +170,9 @@
                 </div>
             </div>
         </div>
+
+
+        <!--CREDENTIAL        -->
         <div class="tab-pane fade" id="nav-credentials" role="tabpanel" aria-labelledby="nav-credentials-tab">
             <button style="margin: 0.25em;" type="button" class="btn btn-info float-right"
                     onclick="showCredentialModal()">
@@ -175,23 +186,29 @@
                         <th style="width: 20%" scope="col"></th>
                         <th style="width: 35%" scope="col">URL</th>
                         <th style="width: 20%" scope="col">Username</th>
-                        <th style="width: 25%" scope="col">Password</th>
+                        <th style="width: 25%" scope="col">Encrypted Password</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
+                    <tr th:each="credential:${credentials}">
                         <td>
-                            <button type="button" class="btn btn-success">Edit</button>
-                            <a class="btn btn-danger">Delete</a>
+                            <button type="button" class="btn btn-success"
+                                    th:onclick="javascript: showCredentialModal([[${credential.credentialId}]],[[${credential.url}]],[[${credential.username}]])">
+                                Edit
+                            </button>
+                            <a class="btn btn-danger" th:href="@{/credential-delete/{credentialId} (credentialId=${credential.credentialId})}">
+                                Delete
+                            </a>
                         </td>
-                        <th scope="row">Example Credential URL</th>
-                        <td>Example Credential Username</td>
-                        <td>Example Credential Password</td>
+                        <td th:text="${credential.url}" />
+                        <td th:text="${credential.username}" />
+                        <td th:text="${credential.password}" />
                     </tr>
                     </tbody>
                 </table>
             </div>
 
+            <!-- Credential Modal -->
             <div class="modal fade" id="credentialModal" tabindex="-1" role="dialog"
                  aria-labelledby="credentialModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -203,7 +220,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form action="#" method="POST">
+                            <form th:action="@{/credential-upload}" method="POST">
                                 <input type="hidden" name="credentialId" id="credential-id">
                                 <div class="form-group">
                                     <label for="note-title" class="col-form-label">URL</label>
@@ -243,6 +260,19 @@
 
 <!--For opening the note modal-->
 <script type="text/javascript">
+    // For decoding the password during opened modal
+    async function fetchDecodedPassword(credentialId) {
+        let response = await fetch(`http://localhost:8080/decode-password?credentialId=${credentialId}`);
+        if (response.ok) {
+            let data = await response.json();
+            let resultData = JSON.parse(JSON.stringify(data));
+            return resultData.decodedPassword;
+        }
+        else {
+            alert("An error occurred decoding the password. " + response.status);
+        }
+    }
+
     // For opening the note modal
     function showNoteModal(noteId, noteTitle, noteDescription) {
         $('#note-id').val(noteId ? noteId : '');
@@ -252,11 +282,15 @@
     }
 
     // For opening the credentials modal
-    function showCredentialModal(credentialId, url, username, password) {
+    async function showCredentialModal(credentialId, url, username) {
+        let decodedPassword = ''
+        if(credentialId) {
+            decodedPassword = await fetchDecodedPassword(credentialId);
+        }
         $('#credential-id').val(credentialId ? credentialId : '');
         $('#credential-url').val(url ? url : '');
         $('#credential-username').val(username ? username : '');
-        $('#credential-password').val(password ? password : '');
+        $('#credential-password').val(decodedPassword ? decodedPassword : '');
         $('#credentialModal').modal('show');
     }
 </script>

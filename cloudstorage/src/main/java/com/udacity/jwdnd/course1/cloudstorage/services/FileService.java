@@ -39,4 +39,8 @@ public class FileService {
     public Boolean isFilenameAvailable(String filename, Integer userId){
         return this.fileMapper.listFilesWithFilenameAndUserId(filename, userId).size() == 0;
     }
+
+    public File getFileById(Long fileId){
+        return this.fileMapper.getFileById(fileId);
+    }
 }

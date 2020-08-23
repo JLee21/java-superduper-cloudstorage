@@ -39,7 +39,7 @@ public interface NoteMapper {
      *
      * @param note
      */
-    @Update("UPDATE NOTES SET notetitle = #{note.noteTitle}, notedescription = #{note.noteDescription}, userId = #{note.userId} WHERE noteid = #{note.noteId}")
+    @Update("UPDATE NOTES SET notetitle = #{note.noteTitle}, notedescription = #{note.noteDescription} WHERE noteid = #{note.noteId}")
     void update(@Param("note") Note note);
 
     /**

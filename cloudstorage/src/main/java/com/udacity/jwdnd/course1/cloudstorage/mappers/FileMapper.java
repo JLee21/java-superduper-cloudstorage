@@ -46,4 +46,10 @@ public interface FileMapper {
     @Select("SELECT * FROM FILES WHERE filename = #{fileName} AND userid = #{userId}")
     List<File> listFilesWithFilenameAndUserId(String fileName, Integer userId);
 
+    /**
+     * Fetch a File by fileId
+     */
+    @Select("SELECT * FROM FILES WHERE fileid = #{fileId}")
+    File getFileById(Long fileId);
+
 }

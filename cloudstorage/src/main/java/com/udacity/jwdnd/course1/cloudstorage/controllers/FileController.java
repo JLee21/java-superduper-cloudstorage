@@ -1,10 +1,14 @@
 package com.udacity.jwdnd.course1.cloudstorage.controllers;
 
+import com.udacity.jwdnd.course1.cloudstorage.models.File;
 import com.udacity.jwdnd.course1.cloudstorage.models.User;
 import com.udacity.jwdnd.course1.cloudstorage.services.CredentialService;
 import com.udacity.jwdnd.course1.cloudstorage.services.FileService;
 import com.udacity.jwdnd.course1.cloudstorage.services.NoteService;
 import com.udacity.jwdnd.course1.cloudstorage.services.UserService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,8 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @Controller
 public class FileController {
@@ -34,23 +36,26 @@ public class FileController {
         this.credentialService = credentialService;
     }
 
-    // Files
-//    @GetMapping("/file/view/{fileId}")
-//    public ResponseEntity<Resource> getFile(@PathVariable Long fileId, Authentication authentication) {
-//        return ResponseEntity.ok()
-//                .contentType(MediaType.parseMediaType(file.getType()))
-//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
-//                .body(new ByteArrayResource(file.getData()));
-//    }
+    @RequestMapping("/file/view/{fileId}")
+    public ResponseEntity downloadFile(@PathVariable("fileId") Long fileId,
+                                       Authentication auth,
+                                       Model model) {
+        File file = this.fileService.getFileById(fileId);
+        String contentType = file.getContentType();
+        String fileName = file.getFileName();
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .body(file.getFileData());
+    }
 
     @PostMapping("/file-upload")
     public String handleFileUpload(@RequestParam("fileUpload") MultipartFile fileUpload,
-                                   Authentication auth, Model model) throws IOException {
+                                   Authentication auth, Model model) {
 
         User currentUser = this.userService.getUser(auth.getName());
 
         // Check if the user already submitted a file with the same name
-//        if (true) {
         if (this.fileService.isFilenameAvailable(fileUpload.getOriginalFilename(), currentUser.getUserId())) {
             try {
                 this.fileService.addFile(fileUpload, currentUser.getUserId());
