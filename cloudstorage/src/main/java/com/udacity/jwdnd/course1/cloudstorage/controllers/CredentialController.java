@@ -68,8 +68,7 @@ public class CredentialController {
                         credentialId,
                         credentialUsername,
                         credentialPassword,
-                        credentialUrl,
-                        currentUser.getUserId());
+                        credentialUrl);
                 model.addAttribute("credentialSuccess", "Credential successfully updated");
             } catch (Exception e) {
                 model.addAttribute("credentialError", "Error updating new Credential");
