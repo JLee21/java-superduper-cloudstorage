@@ -134,28 +134,26 @@ class CloudStorageApplicationTests {
         String username = "testNoteCreateViewDelete";
         String password = "password";
 
+        HomePage homePage = new HomePage(driver);
+
         // Signup
         driver.get(baseURL + "/signup");
         SignupPage signupPage = new SignupPage(driver);
         signupPage.signup("firstname", "lastname", username, password);
 
-        // Wait...
-//        WebDriverWait waitLogin = new WebDriverWait(driver, 5);
-//        waitLogin.until(webDriver -> webDriver.findElement(By.id("login-link")));
         // Verify user can now login and access Home page
         signupPage.clickOnLoginLink();
-        driver.get(baseURL + "/login");
 
         // Login the user
         LoginPage loginPage = new LoginPage(driver);
         loginPage.loginUser(username, password);
-        // Wait...
-//        WebDriverWait waitHome = new WebDriverWait(driver, 5);
-//        waitHome.until(webDriver -> webDriver.findElement(By.id("contentDiv")));
 
         /**
          * Write a test that creates a note, and verifies it is displayed.
          */
+        homePage.goToNotesTab();
+        homePage.goToCredsTab();
+        homePage.goToFilesTab();
 
 
         /**
