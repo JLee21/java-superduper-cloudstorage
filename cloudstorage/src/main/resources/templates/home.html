@@ -65,7 +65,7 @@
                                 <input type="file" class="form-control-file" id="fileUpload" name="fileUpload">
                             </div>
                             <div class="col-sm-4">
-                                <button type="submit" class="btn btn-dark">Upload</button>
+                                <button id="upload-file" type="submit" class="btn btn-dark">Upload</button>
                             </div>
                         </div>
                     </div>
@@ -97,12 +97,12 @@
             <!-- NOTES-->
             <div class="tab-pane fade" id="nav-notes" role="tabpanel" aria-labelledby="nav-notes-tab">
 
-                <button style="margin: 0.25em;" type="button" class="btn btn-info float-right"
+                <button id="add-note" style="margin: 0.25em;" type="button" class="btn btn-info float-right"
                         onclick="showNoteModal()">
                     + Add Note
                 </button>
                 <div class="table-responsive">
-                    <table class="table table-striped" id="userTable">
+                    <table class="table table-striped" id="note-table">
                         <thead>
                         <tr>
                             <th style="width: 20%" scope="col"></th>
@@ -113,13 +113,13 @@
                         <tbody>
                         <tr th:each="note : ${notes}">
                             <td>
-                                <button type="button" class="btn btn-success"
+                                <button id="edit-note" type="button" class="btn btn-success"
                                         th:onclick="javascript: showNoteModal([[${note.noteId}]],[[${note.noteTitle}]],[[${note.noteDescription}]])"
                                 >Edit
                                 </button>
-                                <a class="btn btn-danger" th:href="@{/note-delete/{noteId} (noteId=${note.noteId})}">Delete</a>
+                                <a id="delete-note" class="btn btn-danger" th:href="@{/note-delete/{noteId} (noteId=${note.noteId})}">Delete</a>
                             </td>
-                            <th th:text="${note.noteTitle}" scope="row"></th>
+                            <td th:text="${note.noteTitle}" scope="row"></td>
                             <td th:text="${note.noteDescription}"></td>
                         </tr>
                         </tbody>
@@ -158,7 +158,7 @@
 
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
                                         </button>
-                                        <button type="button" class="btn btn-primary"
+                                        <button id="save-note" type="button" class="btn btn-primary"
                                                 onclick="$('#noteSubmit').click();">
                                             Save
                                             changes
@@ -174,13 +174,13 @@
 
         <!--CREDENTIAL        -->
         <div class="tab-pane fade" id="nav-credentials" role="tabpanel" aria-labelledby="nav-credentials-tab">
-            <button style="margin: 0.25em;" type="button" class="btn btn-info float-right"
+            <button id="add-credential" style="margin: 0.25em;" type="button" class="btn btn-info float-right"
                     onclick="showCredentialModal()">
                 + Add a New Credential
             </button>
 
             <div class="table-responsive">
-                <table class="table table-striped" th:object="${credentials}" id="credentialTable">
+                <table class="table table-striped" th:object="${credentials}" id="credential-table">
                     <thead>
                     <tr>
                         <th style="width: 20%" scope="col"></th>
@@ -192,11 +192,11 @@
                     <tbody>
                     <tr th:each="credential:${credentials}">
                         <td>
-                            <button type="button" class="btn btn-success"
+                            <button id="edit-cred" type="button" class="btn btn-success"
                                     th:onclick="javascript: showCredentialModal([[${credential.credentialId}]],[[${credential.url}]],[[${credential.username}]])">
                                 Edit
                             </button>
-                            <a class="btn btn-danger" th:href="@{/credential-delete/{credentialId} (credentialId=${credential.credentialId})}">
+                            <a id="delete-credential" class="btn btn-danger" th:href="@{/credential-delete/{credentialId} (credentialId=${credential.credentialId})}">
                                 Delete
                             </a>
                         </td>
@@ -242,7 +242,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" onclick="$('#credentialSubmit').click();">
+                            <button id="save-credential" type="button" class="btn btn-primary" onclick="$('#credentialSubmit').click();">
                                 Save changes
                             </button>
                         </div>
@@ -262,14 +262,19 @@
 <script type="text/javascript">
     // For decoding the password during opened modal
     async function fetchDecodedPassword(credentialId) {
-        let response = await fetch(`http://localhost:8080/decode-password?credentialId=${credentialId}`);
-        if (response.ok) {
-            let data = await response.json();
-            let resultData = JSON.parse(JSON.stringify(data));
-            return resultData.decodedPassword;
-        }
-        else {
-            alert("An error occurred decoding the password. " + response.status);
+        try{
+            console.log({credentialId})
+            let response = await fetch(`http://localhost:8080/decode-password?credentialId=${credentialId}`);
+            if (response.ok) {
+                let data = await response.json();
+                let resultData = JSON.parse(JSON.stringify(data));
+                return resultData.decodedPassword;
+            }
+            else {
+                alert("An error occurred decoding the password. " + response.status);
+            }
+        } catch (e) {
+            console.log({e})
         }
     }
 

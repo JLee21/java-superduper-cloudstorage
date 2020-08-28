@@ -1,15 +1,16 @@
 package com.udacity.jwdnd.course1.cloudstorage;
 
+import com.udacity.jwdnd.course1.cloudstorage.models.Credential;
+import com.udacity.jwdnd.course1.cloudstorage.models.Note;
+import com.udacity.jwdnd.course1.cloudstorage.services.EncryptionService;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
@@ -40,7 +41,7 @@ class CloudStorageApplicationTests {
     }
 
     @Test
-    public void testUserSignUp() throws InterruptedException {
+    public void testUserSignUp() {
         /**
          * Sign up a new user, logs that user in, verifies that they can
          * access the home page, then logs out and verifies that the home
@@ -49,28 +50,18 @@ class CloudStorageApplicationTests {
         String username = "testUserSignUp";
         String password = "password";
 
-        WebDriverWait waiter = new WebDriverWait(driver, 5);
-
         // Signup
         driver.get(baseURL + "/signup");
         SignupPage signupPage = new SignupPage(driver);
         signupPage.signup("firstname", "lastname", username, password);
-        // Wait...
-//        Thread.sleep(1000); // B/c webDriver doesn't wait 50% of the time
-//        waiter.until(webDriver -> webDriver.findElement(By.id("login-link")));
         Assertions.assertEquals("You successfully signed up! Please continue to the login page.", signupPage.getLoginLinkSuccessText());
 
         // Verify user can now login and access Home page
         signupPage.clickOnLoginLink();
 
         // Login the user
-//        Thread.sleep(1000); // B/c webDriver doesn't wait 50% of the time
-//        waiter.until(webDriver -> webDriver.findElement(By.id("login-page")));
         LoginPage loginPage = new LoginPage(driver);
         loginPage.loginUser(username, password);
-        // Wait...
-//        Thread.sleep(1000); // B/c webDriver doesn't find the element 50% of the time
-//        waiter.until(webDriver -> webDriver.findElement(By.id("contentDiv")));
         Assertions.assertEquals("Home", driver.getTitle());
 
         // Logout user
@@ -78,8 +69,6 @@ class CloudStorageApplicationTests {
         homePage.logoutUser();
 
         // Try to access Home page
-//        Thread.sleep(1000); // B/c webDriver doesn't wait 50% of the time
-//        waiter.until(webDriver -> webDriver.findElement(By.id("login-page")));
         driver.get(baseURL + "/home");
         Assertions.assertEquals("Login", driver.getTitle());
     }
@@ -105,35 +94,28 @@ class CloudStorageApplicationTests {
     }
 
     @Test
-    public void testUserSignUpFailsOnDuplicateUserName() throws InterruptedException{
+    public void testUserSignUpFailsOnDuplicateUserName() throws InterruptedException {
         /**
          * Verify a user can only sign up if their username is unique.
          */
         String username = "username2";
         String password = "password";
 
-        WebDriverWait waiter = new WebDriverWait(driver, 5);
-
         driver.get(baseURL + "/signup");
         SignupPage signupPage = new SignupPage(driver);
-
         signupPage.signup("firstname", "lastname", username, password);
-//        Thread.sleep(1000);
-//        waiter.until(webDriver -> webDriver.findElement(By.id("success-msg")));
         signupPage.signup("firstname", "lastname", username, password);
-//        waiter.until(webDriver -> webDriver.findElement(By.id("error-msg")));
 
         Assertions.assertEquals("The username already exists.", signupPage.getLoginErrorText());
     }
 
     @Test
-    public void testNoteCreateViewDelete() throws InterruptedException{
+    public void testNoteCreateViewDelete() throws InterruptedException {
         /**
          * Setup: Signup, Login, Go to Home
          */
         String username = "testNoteCreateViewDelete";
         String password = "password";
-
         HomePage homePage = new HomePage(driver);
 
         // Signup
@@ -152,20 +134,106 @@ class CloudStorageApplicationTests {
          * Write a test that creates a note, and verifies it is displayed.
          */
         homePage.goToNotesTab();
-        homePage.goToCredsTab();
-        homePage.goToFilesTab();
+        homePage.addNote("title", "description");
+        homePage.goToNotesTab();
+        Thread.sleep(1000);
+        Note note = homePage.getFirstNote();
+        Assertions.assertEquals("title", note.getNoteTitle());
+        Assertions.assertEquals("description", note.getNoteDescription());
 
 
         /**
          * Write a test that edits an existing note and verifies
          * that the changes are displayed.
          */
+        homePage.goToNotesTab();
+        homePage.editNote("newTitle", "newDescription");
+        homePage.goToNotesTab();
+        Thread.sleep(1000);
+        Note editedNote = homePage.getFirstNote();
+        Assertions.assertEquals("newTitle", editedNote.getNoteTitle());
+        Assertions.assertEquals("newDescription", editedNote.getNoteDescription());
 
 
         /**
          * Write a test that deletes a note and verifies that
          * the note is no longer displayed.
          */
+        homePage.goToNotesTab();
+        homePage.deleteNote();
+        homePage.goToNotesTab();
+        Thread.sleep(1000);
+        Note deletedNote = homePage.getFirstNote();
+        Assertions.assertNull(deletedNote.getNoteTitle());
+        Assertions.assertNull(deletedNote.getNoteDescription());
+    }
+
+
+    @Test
+    public void testViewEditDeleteCredentials() throws InterruptedException {
+        /**
+         * Setup: Signup, Login, Go to Home
+         */
+        String url = "myUrl.com";
+        String username = "username";
+        String password = "password";
+        HomePage homePage = new HomePage(driver);
+        EncryptionService encryptionService = new EncryptionService();
+
+        // Signup
+        driver.get(baseURL + "/signup");
+        SignupPage signupPage = new SignupPage(driver);
+        signupPage.signup("firstname", "lastname", username, password);
+
+        // Verify user can now login and access Home page
+        signupPage.clickOnLoginLink();
+
+        // Login the user
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.loginUser(username, password);
+
+        /**
+         * Write a test that creates a set of credentials,
+         * verifies that they are displayed,
+         * and verifies that the displayed password is encrypted.
+         */
+        homePage.goToCredsTab();
+        homePage.addCred(url, username, password);
+        homePage.goToCredsTab();
+        Thread.sleep(1000);
+        Credential credential = homePage.getFirstCred();
+        Assertions.assertEquals(url, credential.getUrl());
+        Assertions.assertEquals(username, credential.getUsername());
+        Assertions.assertNotEquals(password, credential.getPassword());
+
+        /**
+         * Write a test that views an existing set of credentials,
+         * verifies that the viewable password is unencrypted,
+         * edits the credentials, and verifies that the changes are displayed.
+         */
+        driver.get(baseURL + "/home");
+        homePage.goToCredsTab();
+        Thread.sleep(1000);
+        homePage.editCred("newURL", "newUsername", "newPassword");
+        homePage.goToCredsTab();
+        Thread.sleep(1000);
+        Credential credentialEdited = homePage.getFirstCred();
+        Assertions.assertEquals("newURL", credentialEdited.getUrl());
+        Assertions.assertEquals("newUsername", credentialEdited.getUsername());
+        Assertions.assertNotEquals("newPassword", credentialEdited.getPassword());
+
+        /**
+         * Write a test that deletes an existing set of credentials
+         * and verifies that the credentials are no longer displayed.
+         */
+        homePage.goToCredsTab();
+        homePage.deleteCred();
+        homePage.goToCredsTab();
+        Thread.sleep(1000);
+        Credential deletedCred = homePage.getFirstCred();
+        Assertions.assertNull(deletedCred.getUrl());
+        Assertions.assertNull(deletedCred.getUsername());
+        Assertions.assertNull(deletedCred.getPassword());
     }
 
 }
